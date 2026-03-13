@@ -16,16 +16,16 @@ module Legion
           def create(category:, description:, proposer:, council_size: Layers::MIN_COUNCIL_SIZE)
             id = SecureRandom.uuid
             @proposals[id] = {
-              proposal_id:  id,
-              category:     category,
-              description:  description,
-              proposer:     proposer,
-              council_size: council_size,
-              votes_for:    [],
+              proposal_id:   id,
+              category:      category,
+              description:   description,
+              proposer:      proposer,
+              council_size:  council_size,
+              votes_for:     [],
               votes_against: [],
-              status:       :open,
-              created_at:   Time.now.utc,
-              resolved_at:  nil
+              status:        :open,
+              created_at:    Time.now.utc,
+              resolved_at:   nil
             }
             id
           end

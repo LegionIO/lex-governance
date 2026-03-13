@@ -9,9 +9,7 @@ module Legion
                                                       Legion::Extensions::Helpers.const_defined?(:Lex)
 
           def create_proposal(category:, description:, proposer:, council_size: nil, **)
-            unless Helpers::Layers.valid_category?(category)
-              return { error: :invalid_category, valid: Helpers::Layers::PROPOSAL_CATEGORIES }
-            end
+            return { error: :invalid_category, valid: Helpers::Layers::PROPOSAL_CATEGORIES } unless Helpers::Layers.valid_category?(category)
 
             size = council_size || Helpers::Layers::MIN_COUNCIL_SIZE
             id = proposal_store.create(category: category, description: description,
@@ -39,9 +37,7 @@ module Legion
           end
 
           def validate_action(layer:, action:, context: {}, **)
-            unless Helpers::Layers.valid_layer?(layer)
-              return { error: :invalid_layer }
-            end
+            return { error: :invalid_layer } unless Helpers::Layers.valid_layer?(layer)
 
             case layer
             when :agent_validation
