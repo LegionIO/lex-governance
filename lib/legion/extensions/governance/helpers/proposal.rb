@@ -65,12 +65,9 @@ module Legion
               prop[:status] = :approved
               prop[:resolved_at] = Time.now.utc
               :approved
-            elsif Layers.quorum_met?(prop[:votes_against].size, prop[:council_size])
+            elsif Layers.quorum_met?(prop[:votes_against].size, prop[:council_size]) ||
+                  total_votes >= prop[:council_size]
               prop[:status] = :rejected
-              prop[:resolved_at] = Time.now.utc
-              :rejected
-            elsif total_votes >= prop[:council_size]
-              prop[:status] = :rejected # no quorum for approval after all voted
               prop[:resolved_at] = Time.now.utc
               :rejected
             else

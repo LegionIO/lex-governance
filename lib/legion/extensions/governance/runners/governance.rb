@@ -36,7 +36,7 @@ module Legion
             { proposals: props, count: props.size }
           end
 
-          def validate_action(layer:, action:, context: {}, **)
+          def validate_action(layer:, action: nil, _context: {}, **) # rubocop:disable Lint/UnusedMethodArgument
             return { error: :invalid_layer } unless Helpers::Layers.valid_layer?(layer)
 
             case layer
