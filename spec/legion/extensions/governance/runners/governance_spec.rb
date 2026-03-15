@@ -64,4 +64,38 @@ RSpec.describe Legion::Extensions::Governance::Runners::Governance do
       expect(result[:count]).to eq(1)
     end
   end
+
+  describe '#timeout_proposals' do
+    it 'returns zero timed_out when no proposals exist' do
+      result = client.timeout_proposals
+      expect(result[:checked]).to eq(0)
+      expect(result[:timed_out]).to eq(0)
+      expect(result[:timed_out_ids]).to eq([])
+    end
+
+    it 'returns zero timed_out for recently created proposals' do
+      client.create_proposal(category: :policy_change, description: 'fresh', proposer: 'agent-1')
+      result = client.timeout_proposals
+      expect(result[:timed_out]).to eq(0)
+    end
+
+    it 'times out proposals older than VOTE_TIMEOUT' do
+      prop = client.create_proposal(category: :policy_change, description: 'old', proposer: 'agent-1')
+      store = client.instance_variable_get(:@proposal_store)
+      store.proposals[prop[:proposal_id]][:created_at] = Time.now.utc - (Legion::Extensions::Governance::Helpers::Layers::VOTE_TIMEOUT + 1)
+      result = client.timeout_proposals
+      expect(result[:timed_out]).to eq(1)
+      expect(result[:timed_out_ids]).to include(prop[:proposal_id])
+    end
+
+    it 'does not time out already-resolved proposals' do
+      prop = client.create_proposal(category: :policy_change, description: 'resolved', proposer: 'agent-1', council_size: 3)
+      store = client.instance_variable_get(:@proposal_store)
+      store.proposals[prop[:proposal_id]][:created_at] = Time.now.utc - (Legion::Extensions::Governance::Helpers::Layers::VOTE_TIMEOUT + 1)
+      client.vote_on_proposal(proposal_id: prop[:proposal_id], voter: 'v1', approve: true)
+      client.vote_on_proposal(proposal_id: prop[:proposal_id], voter: 'v2', approve: true)
+      result = client.timeout_proposals
+      expect(result[:timed_out]).to eq(0)
+    end
+  end
 end

@@ -45,6 +45,15 @@ module Legion
             { proposals: props, count: props.size }
           end
 
+          def timeout_proposals(**)
+            open  = proposal_store.open_proposals
+            timed = open.select { |p| Time.now.utc - p[:created_at] > Helpers::Layers::VOTE_TIMEOUT }
+            timed.each { |p| proposal_store.resolve_timed_out(p[:proposal_id]) }
+            timed_ids = timed.map { |p| p[:proposal_id] }
+            Legion::Logging.debug "[governance] vote timeout sweep: open=#{open.size} timed_out=#{timed.size}"
+            { checked: open.size, timed_out: timed.size, timed_out_ids: timed_ids }
+          end
+
           def validate_action(layer:, action: nil, _context: {}, **) # rubocop:disable Lint/UnusedMethodArgument
             return { error: :invalid_layer } unless Helpers::Layers.valid_layer?(layer)
 

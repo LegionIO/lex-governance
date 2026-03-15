@@ -55,6 +55,15 @@ module Legion
             @proposals.values.select { |p| p[:status] == :open }
           end
 
+          def resolve_timed_out(proposal_id)
+            prop = @proposals[proposal_id]
+            return nil unless prop && prop[:status] == :open
+
+            prop[:status]      = :timed_out
+            prop[:resolved_at] = Time.now.utc
+            prop
+          end
+
           private
 
           def check_resolution(proposal_id)
