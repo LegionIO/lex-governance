@@ -84,6 +84,12 @@ Legion::Extensions::Governance::Runners::Governance.validate_action(layer: :tran
 # => { allowed: true, layer: :transparency, reason: :logged, audit_required: true }
 ```
 
+## Actors
+
+| Actor | Interval | Description |
+|-------|----------|-------------|
+| `VoteTimeout` | Every 300s | Closes open proposals that have exceeded `VOTE_TIMEOUT` (24h), setting their status to `:timed_out` and enforcing the vote deadline |
+
 ## Development
 
 ```bash
