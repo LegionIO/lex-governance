@@ -23,9 +23,11 @@ lib/legion/extensions/governance/
   version.rb
   helpers/
     layers.rb    # GOVERNANCE_LAYERS, quorum constants, PROPOSAL_CATEGORIES, valid helpers
-    proposal.rb  # Proposal class - UUID-keyed proposals, vote/check_resolution logic
+    proposal.rb  # Proposal class - UUID-keyed proposals, vote/check_resolution/resolve_timed_out logic
   runners/
-    governance.rb # create_proposal, vote_on_proposal, get_proposal, open_proposals, validate_action
+    governance.rb # create_proposal, vote_on_proposal, get_proposal, open_proposals, validate_action, timeout_proposals
+  actors/
+    vote_timeout.rb  # VoteTimeout - Every 300s, closes proposals past VOTE_TIMEOUT (24h)
 spec/
   legion/extensions/governance/
     runners/
@@ -56,6 +58,16 @@ PROPOSAL_CATEGORIES = %i[policy_change resource_allocation access_control emerge
 
 `check_resolution` (private): approved if `quorum_met?(votes_for.size)`, rejected if `quorum_met?(votes_against.size)` OR all council members voted against.
 
+## Actors
+
+| Actor | Interval | Runner | Method | Purpose |
+|---|---|---|---|---|
+| `VoteTimeout` | Every 300s | `Runners::Governance` | `timeout_proposals` | Closes proposals that have been open past VOTE_TIMEOUT (24h) |
+
+### VoteTimeout
+
+Every 5 minutes, fetches all open proposals and selects those where `Time.now.utc - created_at > VOTE_TIMEOUT`. For each timed-out proposal, calls `proposal_store.resolve_timed_out(proposal_id)`, which sets `status: :timed_out` and stamps `resolved_at`. Returns `{ checked: Integer, timed_out: Integer, timed_out_ids: Array }`. This actor enforces the previously-defined-but-unenforced `VOTE_TIMEOUT` constant.
+
 ## validate_action Logic
 
 The `validate_action` runner method is a static layer-based check (not a runtime permission system). It hardcodes the response for each layer:
@@ -72,7 +84,8 @@ The `validate_action` runner method is a static layer-based check (not a runtime
 
 ## Development Notes
 
-- `VOTE_TIMEOUT = 86_400` is defined but not enforced — proposals do not auto-close after 24 hours in the current implementation
+- `VOTE_TIMEOUT = 86_400` is now enforced by the `VoteTimeout` actor — the note that it was "not enforced" is superseded
 - The `_context:` parameter in `validate_action` is unused (rubocop disable annotation present)
 - `council_size` defaults to `MIN_COUNCIL_SIZE = 3` when not specified in `create_proposal`
 - Double-vote prevention checks combined `votes_for + votes_against` list for the voter identity
+- `resolve_timed_out` on `Helpers::Proposal` sets `status: :timed_out` (distinct from `:approved`/`:rejected`) and stamps `resolved_at`; returns `nil` if proposal not found or already closed
