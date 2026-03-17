@@ -9,7 +9,33 @@ module Legion
     def self.warn(_msg); end
     def self.error(_msg); end
   end
+
+  module Extensions
+    module Actors
+      class Every; end # rubocop:disable Lint/EmptyClass
+    end
+  end
+
+  module Settings
+    @store = {}
+
+    class << self
+      def [](key)
+        @store[key.to_sym] ||= {}
+      end
+
+      def reset!
+        @store = {}
+      end
+    end
+  end
+
+  module Events
+    def self.emit(_name, _payload); end
+  end
 end
+
+$LOADED_FEATURES << 'legion/extensions/actors/every'
 
 require 'legion/extensions/governance'
 
