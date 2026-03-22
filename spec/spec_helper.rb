@@ -48,6 +48,7 @@ require 'legion/extensions/governance'
 require 'legion/extensions/governance/helpers/airb'
 require 'legion/extensions/governance/helpers/authority'
 require 'legion/extensions/governance/runners/governance'
+require 'legion/extensions/governance/helpers/council'
 
 RSpec.configure do |config|
   config.example_status_persistence_file_path = '.rspec_status'
