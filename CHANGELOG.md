@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.0] - 2026-03-22
+
+### Added
+- `review_transition`: central governance check running AIRB, council, and authority gates
+- `Helpers::Council`: delegates approval workflow to lex-audit ApprovalQueue (permissive when lex-audit absent)
+- `Helpers::Authority`: validates caller has required authority level for transition
+- Configurable settings: `governance.enabled`, `governance.auto_submit_approval`, `governance.bypass_in_dev`, `governance.council.required_transitions`
+- Auto-submit approval requests to lex-audit when transitions are blocked (configurable)
+
 ## [0.2.1] - 2026-03-22
 
 ### Added
