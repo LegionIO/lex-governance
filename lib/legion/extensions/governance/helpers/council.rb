@@ -8,9 +8,7 @@ module Legion
           module_function
 
           def council_approved?(worker_id:, from_state:, to_state:, **)
-            unless defined?(Legion::Extensions::Audit::Runners::ApprovalQueue)
-              return { allowed: true, reason: :audit_not_loaded }
-            end
+            return { allowed: true, reason: :audit_not_loaded } unless defined?(Legion::Extensions::Audit::Runners::ApprovalQueue)
 
             record = find_approved_record(worker_id: worker_id, from_state: from_state, to_state: to_state)
             if record
@@ -28,12 +26,12 @@ module Legion
 
             Legion::Extensions::Audit::Runners::ApprovalQueue.submit(
               approval_type: 'lifecycle_transition',
-              payload:       { worker_id: worker_id, from_state: from_state, to_state: to_state },
-              requester_id:  requester_id
+              payload: { worker_id: worker_id, from_state: from_state, to_state: to_state },
+              requester_id: requester_id
             )
           end
 
-          def find_approved_record(worker_id:, from_state:, to_state:)
+          def find_approved_record(**)
             nil
           rescue StandardError
             nil

@@ -28,6 +28,9 @@ Metrics/ParameterLists:
 Layout/LineLength:
   Max: 130
 
+Naming/PredicateMethod:
+  Enabled: false
+
 Lint/EmptyClass:
   Exclude:
     - 'spec/**/*'

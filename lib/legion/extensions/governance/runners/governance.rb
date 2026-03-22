@@ -15,21 +15,11 @@ module Legion
                                              worker_owner: worker_owner)
 
             blocked = results.reject { |r| r[:allowed] }
-            if blocked.empty?
-              { allowed: true, checks: results }
-            else
-              auto_submitted = false
-              if auto_submit? && blocked.any? { |r| r[:reason] == :council_approval_required }
-                require_relative '../helpers/council'
-                Helpers::Council.submit_approval(
-                  worker_id: worker_id, from_state: from_state, to_state: to_state,
-                  requester_id: principal_id || 'system'
-                )
-                auto_submitted = true
-              end
-              { allowed: false, reasons: blocked.map { |r| r[:reason] }, checks: results,
-                auto_submitted: auto_submitted }
-            end
+            return { allowed: true, checks: results } if blocked.empty?
+
+            auto = try_auto_submit(blocked, worker_id: worker_id, from_state: from_state, to_state: to_state,
+                                            requester_id: principal_id || 'system')
+            { allowed: false, reasons: blocked.map { |r| r[:reason] }, checks: results, auto_submitted: auto }
           end
 
           def check_airb_approval(worker_id:, **)
@@ -40,12 +30,12 @@ module Legion
             allowed = !required || acceptable.include?(record.status)
 
             {
-              allowed:   allowed,
+              allowed: allowed,
               worker_id: worker_id,
-              airb_id:   record.airb_id,
-              status:    record.status,
+              airb_id: record.airb_id,
+              status: record.status,
               risk_tier: record.risk_tier,
-              reason:    allowed ? :airb_cleared : :airb_blocked
+              reason: allowed ? :airb_cleared : :airb_blocked
             }
           end
 
@@ -69,8 +59,8 @@ module Legion
             gov = Legion::Settings[:governance]
             return false if gov.is_a?(Hash) && gov.key?(:enabled) && gov[:enabled] == false
 
-            if Legion::Settings.dig(:governance, :bypass_in_dev)
-              return false if Legion::Settings.respond_to?(:dev_mode?) && Legion::Settings.dev_mode?
+            if Legion::Settings.dig(:governance, :bypass_in_dev) && Legion::Settings.respond_to?(:dev_mode?) && Legion::Settings.dev_mode?
+              return false
             end
 
             true
@@ -88,6 +78,15 @@ module Legion
           end
 
           private
+
+          def try_auto_submit(blocked, worker_id:, from_state:, to_state:, requester_id:)
+            return false unless auto_submit? && blocked.any? { |r| r[:reason] == :council_approval_required }
+
+            require_relative '../helpers/council'
+            Helpers::Council.submit_approval(worker_id: worker_id, from_state: from_state, to_state: to_state,
+                                             requester_id: requester_id)
+            true
+          end
 
           def council_required?(from_state, to_state)
             custom = council_required_transitions
