@@ -6,8 +6,8 @@ module Legion
       module Helpers
         module Authority
           AUTHORITY_REQUIRED = {
-            %w[active paused]  => :owner_or_manager,
-            %w[paused active]  => :owner_or_manager,
+            %w[active paused] => :owner_or_manager,
+            %w[paused active] => :owner_or_manager,
             %w[active retired] => :owner_or_manager
           }.freeze
 
