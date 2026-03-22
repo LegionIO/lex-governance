@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.2.1] - 2026-03-22
+
+### Added
+- CI workflow for automated testing and gem release
+
 ## [0.1.0] - 2026-03-21
 
 ### Added
