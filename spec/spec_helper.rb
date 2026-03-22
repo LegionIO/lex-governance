@@ -46,6 +46,7 @@ end
 
 require 'legion/extensions/governance'
 require 'legion/extensions/governance/helpers/airb'
+require 'legion/extensions/governance/helpers/authority'
 require 'legion/extensions/governance/runners/governance'
 
 RSpec.configure do |config|
