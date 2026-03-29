@@ -10,7 +10,7 @@ Legion Extension that serves as the policy decision point for worker lifecycle t
 
 **GitHub**: https://github.com/LegionIO/lex-governance
 **License**: MIT
-**Version**: 0.3.0
+**Version**: 0.3.1
 
 ## Architecture
 
