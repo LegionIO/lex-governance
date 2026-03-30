@@ -20,20 +20,18 @@ module Legion
           end
 
           def submit_approval(worker_id:, from_state:, to_state:, requester_id:, **)
-            unless defined?(Legion::Extensions::Audit::Runners::ApprovalQueue)
-              return { success: false, reason: :audit_not_loaded }
-            end
+            return { success: false, reason: :audit_not_loaded } unless defined?(Legion::Extensions::Audit::Runners::ApprovalQueue)
 
             Legion::Extensions::Audit::Runners::ApprovalQueue.submit(
               approval_type: 'lifecycle_transition',
-              payload: { worker_id: worker_id, from_state: from_state, to_state: to_state },
-              requester_id: requester_id
+              payload:       { worker_id: worker_id, from_state: from_state, to_state: to_state },
+              requester_id:  requester_id
             )
           end
 
           def find_approved_record(**)
             nil
-          rescue StandardError
+          rescue StandardError => _e
             nil
           end
         end
