@@ -56,8 +56,8 @@ RSpec.describe Legion::Extensions::Governance::Helpers::Council do
       it 'delegates to ApprovalQueue.submit' do
         expect(approval_queue).to receive(:submit).with(
           approval_type: 'lifecycle_transition',
-          payload: { worker_id: 'w1', from_state: 'active', to_state: 'terminated' },
-          requester_id: 'system'
+          payload:       { worker_id: 'w1', from_state: 'active', to_state: 'terminated' },
+          requester_id:  'system'
         ).and_return({ success: true, approval_id: 42, status: 'pending' })
 
         result = described_class.submit_approval(worker_id: 'w1', from_state: 'active', to_state: 'terminated',

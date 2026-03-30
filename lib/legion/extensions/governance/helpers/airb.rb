@@ -12,9 +12,9 @@ module Legion
           }.freeze
 
           ACCEPTABLE_STATUSES = {
-            low: %i[unknown pending approved conditional],
-            medium: %i[unknown pending approved conditional],
-            high: %i[approved conditional],
+            low:      %i[unknown pending approved conditional],
+            medium:   %i[unknown pending approved conditional],
+            high:     %i[approved conditional],
             critical: %i[approved]
           }.freeze
 
@@ -43,10 +43,10 @@ module Legion
             end
 
             AirbRecord.new(
-              worker_id: worker_id,
-              airb_id: entry[:airb_id],
-              status: (entry[:status] || 'unknown').to_sym,
-              risk_tier: (entry[:risk_tier] || 'low').to_sym,
+              worker_id:  worker_id,
+              airb_id:    entry[:airb_id],
+              status:     (entry[:status] || 'unknown').to_sym,
+              risk_tier:  (entry[:risk_tier] || 'low').to_sym,
               expires_at: entry[:expires_at],
               conditions: entry[:conditions] || []
             )
