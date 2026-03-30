@@ -35,7 +35,7 @@ module Legion
   end
 
   module Settings
-    @store = {}
+    @store = {} # rubocop:disable ThreadSafety/MutableClassInstanceVariable
 
     class << self
       def [](key)
